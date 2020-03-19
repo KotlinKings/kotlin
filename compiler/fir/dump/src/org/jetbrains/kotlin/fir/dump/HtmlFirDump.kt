@@ -702,15 +702,15 @@ class HtmlFirDump internal constructor(private var linkResolver: FirLinkResolver
                     symbolRef(symbol) {
                         simpleName(type.lookupTag.name)
                     }
+                    generateTypeArguments(type)
                     +" = "
-                    generate(
-                        type.directExpansionType(session)?.fullyExpandedType(session) ?: ConeKotlinErrorType("No expansion for type-alias")
-                    )
+                    generate(type.fullyExpandedType(session))
                 }
                 else -> {
                     symbolRef(symbol) {
                         fqn(type.lookupTag.classId.relativeClassName)
                     }
+                    generateTypeArguments(type)
                 }
             }
         }
@@ -791,10 +791,20 @@ class HtmlFirDump internal constructor(private var linkResolver: FirLinkResolver
 
     }
 
+    private fun FlowContent.generateTypeArguments(type: ConeKotlinType) {
+        if (type.typeArguments.isNotEmpty()) {
+            +"<"
+            generateList(type.typeArguments.toList()) {
+                generate(it)
+            }
+            +">"
+        }
+    }
+
     private fun FlowContent.generate(type: ConeKotlinType) {
         when (type) {
             is ConeClassErrorType -> error { +type.reason }
-            is ConeClassLikeType -> generate(type)
+            is ConeClassLikeType -> return generate(type)
             is ConeTypeParameterType -> resolved {
                 symbolRef(type.lookupTag.toSymbol()) {
                     simpleName(type.lookupTag.name)
@@ -810,13 +820,7 @@ class HtmlFirDump internal constructor(private var linkResolver: FirLinkResolver
             is ConeIntersectionType -> resolved { generate(type) }
             is ConeIntegerLiteralType -> inlineUnsupported(type)
         }
-        if (type.typeArguments.isNotEmpty()) {
-            +"<"
-            generateList(type.typeArguments.toList()) {
-                generate(it)
-            }
-            +">"
-        }
+        generateTypeArguments(type)
         if (type.isMarkedNullable) {
             +"?"
         }
