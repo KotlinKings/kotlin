@@ -128,8 +128,8 @@ class ConstraintIncorporator(
 
         when (baseConstraint.kind) {
             ConstraintKind.EQUALITY -> {
-                addNewConstraint(targetVariable, baseConstraint, otherVariable, otherConstraint, typeWithSubstitution, isSubtype = false)
-                addNewConstraint(targetVariable, baseConstraint, otherVariable, otherConstraint, typeWithSubstitution, isSubtype = true)
+                addNewConstraint(targetVariable, baseConstraint, otherVariable, otherConstraint, prepareType(true), isSubtype = false)
+                addNewConstraint(targetVariable, baseConstraint, otherVariable, otherConstraint, prepareType(false), isSubtype = true)
             }
             ConstraintKind.UPPER -> {
                 addNewConstraint(targetVariable, baseConstraint, otherVariable, otherConstraint, prepareType(true), isSubtype = false)
