@@ -121,6 +121,7 @@ class TypeDeserializer(
         }
 
         return when {
+            // FIXME why testlib.Greeting has typealias name?
             proto.hasClassName() -> (classDescriptors(proto.className) ?: notFoundClass(proto.className)).typeConstructor
             proto.hasTypeParameter() ->
                 typeParameterTypeConstructor(proto.typeParameter)
